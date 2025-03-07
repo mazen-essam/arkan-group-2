@@ -1,0 +1,99 @@
+{
+    "NavBar": {
+        "home": "Home",
+        "rent": "Rent",
+        "services": "Services",
+        "favourite": "Favourite",
+        "signinBtn": "Sign in",
+        "signupBtn": "Sign up"
+    },
+    "pageJs":{
+        "auth":"Auth",
+        "notAuth":"Not Auth"
+    },
+    "Register": {
+        "located":"I'm located in ",
+        "chooseCountry":"Choose country",
+        "egypt":"Egypt",
+        "uae":"United Arab Emirates",
+        "registerTitle": "Create Aqar tech Account",
+        "registerDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "signup1":"Sign up with the email",
+        "signup2":"Sign up with facebook",
+        "signup3":"Already have Aqar account?",
+        "signup4":"Log in",
+        "proceeding":"By proceeding, you agree to the ",
+        "or":"or",
+        "and":"and",
+        "terms":"terms and conditions",
+        "privacy":"privacy policy."
+    },
+    "SignUp":{
+        "signupTitle":"Create Your Account",
+        "signupSubtitle":"Welcome! Please fill the details to get started.",
+        "formLabel1":"First Name",
+        "formLabel2":"Last Name",
+        "formLabel3":"Email address",
+        "formLabel4":"Password",
+        "formLabel5":"Change Password",
+        "contBtn":"Continue"
+    },
+    "Signin":{
+        "signinTitle":"Sign in",
+        "signin1":"Sign in with the email",
+        "signin2":"Sign in with facebook"
+    },
+    "Verification":{
+        "verificationTitle":"Verify your mail",
+        "verificationSubTitle":"Enter the verification code sent to your email Aqar tech@gmail.com",
+        "resend":"Didn't receive a code? Resend",
+        "signinBtn":"SIGN IN"
+    },
+    "HomePage": {
+        "title": "Let's find a villa That's Perfect for you",
+        "input1": "Looking for",
+        "input2": "Type",
+        "input3": "Price",
+        "input4": "Location",
+        "searchBtn": "Search",
+        "brandsTitle": "Trusted by 20,000+ companies",
+        "purchasingTitle": "Explore our Apartments for purchasing",
+        "rentTitle": "Explore our Apartments for rent",
+        "servicesTitle": "Explore our Apartments for services",
+        "cardTitle": "Griya Aari tamansari"
+    },
+    "RentPage": {
+        "mostPopular": "Most Popular",
+        "apartForRent": "Cosy apartment for rent",
+        "Abudhabi": "Abudhabi",
+        "rentDescription": "Located on the plateau central and close to all amenities, this apartment's location on the first floor of a downtown building will be ideal for your...",
+        "retailPrice": "Retail price: 500,000 ADE / night",
+        "detailsBtn": "SHOW MORE DETAILS"
+    },
+    "Footer": {
+        "footerTitle": "Aqar tech",
+        "footerDescription": "Aqar tech is a cutting-edge real estate technology platform that streamlines porperty management, buying, and selling through innovative digital solutions.",
+        "projectTitle": "Project",
+        "projectList1": "Download",
+        "projectList2": "Changing",
+        "projectList3": "Commision Icons",
+        "projectList4": "All Versions",
+        "communityTitle": "Community",
+        "communityList1": "Github",
+        "communityList2": "Icon Requests",
+        "communityList3": "Twitter",
+        "communityList4": "Blog Awsome",
+        "helpTitle": "Help",
+        "helpList1": "Support",
+        "helpList2": "Troubleshooting",
+        "helpList3": "Contact Us",
+        "helpList4": "Status",
+        "finalList1": "License",
+        "finalList2": "Terms of service",
+        "finalList3": "Privacy Policy",
+        "finalList4": "Refunds",
+        "finalList5": "Cookie",
+        "finalList6": "Preferences",
+        "copyRight": "Aqar tech 2025"
+    }
+}

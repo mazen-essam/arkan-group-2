@@ -1,0 +1,72 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "user@example.com",
+      "phone": "1234567890",
+      "role": "admin",
+      "image": "http://example.com/image.jpg",
+      "password": "password"
+    }
+  ],
+  "login": [
+    {
+      "email": "user@example.com",
+      "password": "password",
+      "response": {
+        "message": "Login Successful",
+        "data": "JWT_TOKEN",
+        "status": 200
+      }
+    },
+    {
+      "id": "9cf2",
+      "email": "xabdo608@gmail.com",
+      "password": "123456789"
+    },
+    {
+      "id": "6cc7",
+      "email": "xabdo608@gmail.com",
+      "password": "123456789"
+    },
+    {
+      "id": "eb3f",
+      "email": "xabdo608@gmail.com",
+      "password": "123456789"
+    },
+    {
+      "id": "5eee",
+      "email": "xabdo608@gmail.com",
+      "password": "123456789"
+    }
+  ],
+  "register": [
+    {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "user@example.com",
+      "phone": "1234567890",
+      "password": "password",
+      "response": {
+        "message": "Register Successful",
+        "data": {
+          "id": 1,
+          "first_name": "John",
+          "last_name": "Doe",
+          "email": "user@example.com",
+          "phone": "1234567890"
+        },
+        "status": 201
+      }
+    },
+    {
+      "id": "ba26",
+      "firstName": "Abdelrahman",
+      "lastName": "Mohamed",
+      "email": "xabdo608@gmail.com",
+      "password": "123456789"
+    }
+  ]
+}
