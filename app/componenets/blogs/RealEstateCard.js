@@ -1,8 +1,16 @@
-import Image from "next/image";
+"use client";
+import React from "react";
 
-const RealEstateCard = ({ img }) => {
+import Image from "next/image";
+import Aos from "aos";
+import "aos/dist/aos.css";
+import { useEffect } from "react";
+const RealEstateCard = React.memo(({ img }) => {
+  useEffect(() => {
+    Aos.init({ duration: 700, once: true });
+  }, []);
   return (
-    <div className="flex items-center gap-4  pb-4">
+    <div className="flex items-center gap-4  pb-4" data-aos="fade-up">
       {/* Image */}
       <div className="w-36 h-36 relative">
         <Image
@@ -24,6 +32,6 @@ const RealEstateCard = ({ img }) => {
       </div>
     </div>
   );
-};
+});
 
 export default RealEstateCard;

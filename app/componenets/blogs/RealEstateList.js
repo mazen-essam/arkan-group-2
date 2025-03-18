@@ -1,8 +1,16 @@
-import Image from "next/image";
+"use client";
+import React from "react";
 
-const RealEstateList = ({ img }) => {
+import Image from "next/image";
+import { useEffect } from "react";
+import Aos from "aos";
+import "aos/dist/aos.css";
+const RealEstateList = React.memo(({ img }) => {
+  useEffect(() => {
+    Aos.init({ duration: 700, once: true });
+  }, []);
   return (
-    <div className="flex  flex-col items-center gap-4  pb-4">
+    <div className="flex  flex-col items-center gap-4  pb-4" data-aos="zoom-in">
       {/* Image */}
       <div className="w-full h-52 relative">
         <Image
@@ -23,6 +31,6 @@ const RealEstateList = ({ img }) => {
       </div>
     </div>
   );
-};
+});
 
 export default RealEstateList;

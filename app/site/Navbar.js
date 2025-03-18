@@ -12,6 +12,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const [platformOpen, setPlatformOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -31,16 +32,20 @@ export default function Navbar() {
   }, [pathname]);
 
   const isTransparentPage =
-    pathname === "/site/home" || pathname.startsWith("/auth") || pathname === "/site/otherPage1" || pathname === "/site/otherPage2";
+    pathname === "/site/home" ||
+    pathname.startsWith("/auth") ||
+    pathname === "/site/otherPage1" ||
+    pathname === "/site/otherPage2";
   const navbarStyles = isTransparentPage
     ? isScrolled
       ? "bg-white text-gray-800 shadow-md"
       : "bg-transparent text-white"
     : "bg-white text-gray-800 shadow-md";
 
-  const dropdownStyles = isTransparentPage && !isScrolled
-    ? "bg-transparent text-white"
-    : "bg-white text-gray-800";
+  const dropdownStyles =
+    isTransparentPage && !isScrolled
+      ? "bg-transparent text-white"
+      : "bg-white text-gray-800";
 
   return (
     <nav
@@ -73,7 +78,7 @@ export default function Navbar() {
             <Link href="/site/blog">
               <button>Blog</button>
             </Link>
-            
+
             <div className="relative">
               <button
                 onClick={() => setPropertiesOpen(!propertiesOpen)}
@@ -82,7 +87,9 @@ export default function Navbar() {
                 Shares <i className="fa-solid fa-chevron-down ml-1"></i>
               </button>
               {propertiesOpen && (
-                <div className={`absolute left-0 mt-2 w-40 shadow-md rounded-md py-2 ${dropdownStyles}`}>
+                <div
+                  className={`absolute left-0 mt-2 w-40 shadow-md rounded-md py-2 ${dropdownStyles}`}
+                >
                   <Link href="/site/properties">
                     <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                       properties
@@ -102,6 +109,31 @@ export default function Navbar() {
                   <Link href="/site/refer">
                     <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                       Refer
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => setPlatformOpen(!platformOpen)}
+                className="focus:outline-none"
+              >
+                Platform <i className="fa-solid fa-chevron-down ml-1"></i>
+              </button>
+              {platformOpen && (
+                <div
+                  className={`absolute left-0 mt-2 w-40 shadow-md rounded-md py-2 ${dropdownStyles}`}
+                >
+                  <Link href="/site/platform">
+                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                      Main
+                    </button>
+                  </Link>
+
+                  <Link href="/site/sales">
+                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                      Sales
                     </button>
                   </Link>
                 </div>
@@ -136,6 +168,7 @@ export default function Navbar() {
               </>
             )}
           </div>
+
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -150,7 +183,9 @@ export default function Navbar() {
           </div>
         </div>
         {menuOpen && (
-          <div className={`md:hidden flex flex-col space-y-4 px-4 py-2 shadow-md rounded-md ${dropdownStyles}`}>
+          <div
+            className={`md:hidden flex flex-col space-y-4 px-4 py-2 shadow-md rounded-md ${dropdownStyles}`}
+          >
             <Link href="/site/home">
               <button className="text-gray-800">Home</button>
             </Link>
@@ -171,7 +206,9 @@ export default function Navbar() {
                 Properties <i className="fa-solid fa-chevron-down ml-1"></i>
               </button>
               {propertiesOpen && (
-                <div className={`mt-2 w-full shadow-md rounded-md py-2 ${dropdownStyles}`}>
+                <div
+                  className={`mt-2 w-full shadow-md rounded-md py-2 ${dropdownStyles}`}
+                >
                   <Link href="/site/wallet">
                     <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                       Wallet

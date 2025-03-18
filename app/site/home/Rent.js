@@ -55,7 +55,7 @@ const properties = [
   },
 ];
 
-export default function Rent({classes ="" ,moreSetting= {}}) {
+export default function Rent({ classes = "", moreSetting = {}, header }) {
   // React Slick settings
   const settings = {
     dots: true, // Show pagination dots
@@ -94,7 +94,7 @@ export default function Rent({classes ="" ,moreSetting= {}}) {
       data-aos="fade-up"
     >
       <h1 className="font-bold text-2xl mb-6">
-        Explore our Apartments for service
+        {header != "" ? header : "Explore our Apartments for rent"}
       </h1>
       <Slider {...settings} {...moreSetting}>
         {properties.map((item) => (
