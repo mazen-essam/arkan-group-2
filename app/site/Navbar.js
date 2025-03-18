@@ -70,6 +70,10 @@ export default function Navbar() {
             <Link href="/site/contactPage">
               <button>Contact us</button>
             </Link>
+            <Link href="/site/blog">
+              <button>Blog</button>
+            </Link>
+            
             <div className="relative">
               <button
                 onClick={() => setPropertiesOpen(!propertiesOpen)}
