@@ -1,191 +1,33 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Async thunk for fetching properties
+export const fetchProperties = createAsyncThunk(
+  "properties/fetchProperties",
+  async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/properties`);
+    return response.data.data; // Access the 'data' array from the response
+  }
+);
+
+// Async thunk for updating a property
+export const updateProperty = createAsyncThunk(
+  "properties/updateProperty",
+  async (updatedProperty) => {
+    const response = await axios.put(
+      `${API_BASE_URL}/api/properties/${updatedProperty.id}`,
+      updatedProperty
+    );
+    return response.data.data; // Return the updated property from the 'data' field
+  }
+);
 
 const initialState = {
-  apartments: [
-    {
-      id: 1,
-      title: "Modern Apartment in Downtown",
-      price: 1200,
-      type: "Apartment",
-      bedrooms: 2,
-      bathrooms: 2,
-      furnished: true,
-      paymentPlan: "Monthly",
-      location: "Downtown, Cairo",
-      rating: 4.5,
-      reviews: 25,
-      amenities: ["Swimming Pool", "Gym", "Parking"],
-      description:
-        "A modern and spacious apartment located in the heart of downtown, perfect for professionals.",
-      area: "1200 sqft",
-      downPayment: "20%",
-      installment: "$800/month",
-      annualInstallment: "$9600/year",
-      expectedExit: "5 years",
-      totalUnitPrice: "$240,000",
-      status: "available",
-    },
-    {
-      id: 2,
-      title: "Cozy Studio Near the Park",
-      price: 950,
-      type: "Studio",
-      bedrooms: 1,
-      bathrooms: 1,
-      furnished: false,
-      paymentPlan: "Yearly",
-      location: "Zamalek, Cairo",
-      rating: 4.0,
-      reviews: 18,
-      amenities: ["Parking", "Balcony"],
-      description:
-        "A cozy studio with a beautiful view of the park, ideal for singles or couples.",
-      area: "800 sqft",
-      downPayment: "15%",
-      installment: "$600/month",
-      annualInstallment: "$7200/year",
-      expectedExit: "4 years",
-      totalUnitPrice: "$180,000",
-      status: "funded",
-    },
-    {
-      id: 3,
-      title: "Luxury Villa with Garden",
-      price: 3500,
-      type: "Villa",
-      bedrooms: 4,
-      bathrooms: 3,
-      furnished: true,
-      paymentPlan: "Monthly",
-      location: "New Cairo",
-      rating: 4.8,
-      reviews: 32,
-      amenities: ["Swimming Pool", "Garden", "Garage", "Security"],
-      description:
-        "A luxurious villa with a large garden and private swimming pool, perfect for families.",
-      area: "3000 sqft",
-      downPayment: "25%",
-      installment: "$2000/month",
-      annualInstallment: "$24,000/year",
-      expectedExit: "10 years",
-      totalUnitPrice: "$600,000",
-      status: "exited",
-    },
-    {
-      id: 4,
-      title: "Budget Friendly Apartment",
-      price: 700,
-      type: "Apartment",
-      bedrooms: 1,
-      bathrooms: 1,
-      furnished: false,
-      paymentPlan: "Monthly",
-      location: "Maadi, Cairo",
-      rating: 3.8,
-      reviews: 15,
-      amenities: ["Parking"],
-      description:
-        "A budget-friendly apartment in a quiet neighborhood, suitable for students or young professionals.",
-      area: "900 sqft",
-      downPayment: "10%",
-      installment: "$500/month",
-      annualInstallment: "$6000/year",
-      expectedExit: "3 years",
-      totalUnitPrice: "$120,000",
-      status: "available",
-    },
-    {
-      id: 5,
-      title: "Penthouse with City View",
-      price: 2800,
-      type: "Penthouse",
-      bedrooms: 3,
-      bathrooms: 2,
-      furnished: true,
-      paymentPlan: "Yearly",
-      location: "Mohandessin, Cairo",
-      rating: 4.6,
-      reviews: 28,
-      amenities: ["Terrace", "Gym", "Parking", "Concierge"],
-      description:
-        "A stunning penthouse with breathtaking city views, featuring a large terrace and premium amenities.",
-      area: "2500 sqft",
-      downPayment: "30%",
-      installment: "$1500/month",
-      annualInstallment: "$18,000/year",
-      expectedExit: "7 years",
-      totalUnitPrice: "$420,000",
-      status: "funded",
-    },
-    {
-      id: 6,
-      title: "Rustic Cottage by the Nile",
-      price: 1500,
-      type: "Cottage",
-      bedrooms: 2,
-      bathrooms: 1,
-      furnished: true,
-      paymentPlan: "Monthly",
-      location: "Giza, Cairo",
-      rating: 4.2,
-      reviews: 20,
-      amenities: ["Garden", "River View"],
-      description:
-        "A charming rustic cottage located by the Nile, offering a peaceful and relaxing atmosphere.",
-      area: "1500 sqft",
-      downPayment: "20%",
-      installment: "$1000/month",
-      annualInstallment: "$12,000/year",
-      expectedExit: "6 years",
-      totalUnitPrice: "$300,000",
-      status: "exited",
-    },
-    {
-      id: 7,
-      title: "Commercial Space Downtown",
-      price: 2000,
-      type: "Commercial",
-      bedrooms: 0,
-      bathrooms: 1,
-      furnished: false,
-      paymentPlan: "Monthly",
-      location: "Downtown, Cairo",
-      rating: 4.3,
-      reviews: 22,
-      amenities: ["High Speed Internet", "Security"],
-      description:
-        "A spacious commercial space in a prime location, suitable for offices or retail.",
-      area: "5000 sqft",
-      downPayment: "40%",
-      installment: "$3000/month",
-      annualInstallment: "$36,000/year",
-      expectedExit: "8 years",
-      totalUnitPrice: "$720,000",
-      status: "available",
-    },
-    {
-      id: 8,
-      title: "Family Apartment with Balcony",
-      price: 1100,
-      type: "Apartment",
-      bedrooms: 3,
-      bathrooms: 2,
-      furnished: false,
-      paymentPlan: "Monthly",
-      location: "Heliopolis, Cairo",
-      rating: 4.1,
-      reviews: 19,
-      amenities: ["Balcony", "Parking", "Playground"],
-      description: "A comfortable family apartment with a balcony and access to a playground.",
-      area: "1800 sqft",
-      downPayment: "20%",
-      installment: "$900/month",
-      annualInstallment: "$10,800/year",
-      expectedExit: "5 years",
-      totalUnitPrice: "$270,000",
-      status: "funded",
-    },
-  ],
+  properties: [],
+  loading: false,
+  error: null,
   searchQuery: "",
   minPrice: "",
   maxPrice: "",
@@ -196,9 +38,8 @@ const initialState = {
   sortBy: "default",
 };
 
-
-const fakePropertySlice = createSlice({
-  name: "apartments",
+const propertySlice = createSlice({
+  name: "properties",
   initialState,
   reducers: {
     setSearchQuery: (state, action) => {
@@ -250,6 +91,74 @@ const fakePropertySlice = createSlice({
       state.sortBy = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      // Fetch properties cases
+      .addCase(fetchProperties.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProperties.fulfilled, (state, action) => {
+        state.loading = false;
+        state.properties = action.payload.map(property => ({
+          id: property.id,
+          title: property.title,
+          description: property.description,
+          price: property.price,
+          rent_amount: property.rent_amount,
+          type: property.features, // Assuming features contains the property type
+          bedrooms: property.beds,
+          bathrooms: property.bathrooms,
+          furnished: property.is_furnished,
+          paymentPlan: property.lease_start ? "Leased" : "Available", // Simplified
+          location: property.location,
+          amenities: property.amenities.split(','), // Convert string to array
+          area: `${property.land_space} sqft`,
+          status: property.status,
+          image: property.image
+        }));
+      })
+      .addCase(fetchProperties.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      
+      // Update property cases
+      .addCase(updateProperty.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProperty.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedProperty = action.payload;
+        const index = state.properties.findIndex(
+          (property) => property.id === updatedProperty.id
+        );
+        if (index !== -1) {
+          state.properties[index] = {
+            id: updatedProperty.id,
+            title: updatedProperty.title,
+            description: updatedProperty.description,
+            price: updatedProperty.price,
+            rent_amount: updatedProperty.rent_amount,
+            type: updatedProperty.features,
+            bedrooms: updatedProperty.beds,
+            bathrooms: updatedProperty.bathrooms,
+            furnished: updatedProperty.is_furnished,
+            paymentPlan: updatedProperty.lease_start ? "Leased" : "Available",
+            location: updatedProperty.location,
+            amenities: updatedProperty.amenities.split(','),
+            area: `${updatedProperty.land_space} sqft`,
+            status: updatedProperty.status,
+            image: updatedProperty.image
+          };
+        }
+      })
+      .addCase(updateProperty.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
 });
 
 export const {
@@ -261,6 +170,6 @@ export const {
   toggleFurnitureFilter,
   togglePaymentPlanFilter,
   setSortBy,
-} = fakePropertySlice.actions;
+} = propertySlice.actions;
 
-export default fakePropertySlice.reducer;
+export default propertySlice.reducer;

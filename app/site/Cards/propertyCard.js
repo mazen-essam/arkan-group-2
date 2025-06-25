@@ -33,8 +33,20 @@ import React from 'react';
 
         {/* Type and Location */}
         <p className="text-sm text-gray-500 mt-1">
-          {type} · {location}
-        </p>
+  {type?.view || type?.balcony || type?.parking ? (
+    <>
+      {type.view && <span>{type.view}</span>}
+      {type.balcony && <span> · {type.balcony}</span>}
+      {type.parking && <span> · {type.parking}</span>}
+    </>
+  ) : (
+    <span>{location}</span>
+  )}
+</p>
+<p className="text-sm text-gray-500">
+  {location}
+</p>
+
 
         {/* Rating and Reviews */}
         <div className="flex items-center mt-2">

@@ -1,41 +1,54 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ImgGallery from "../../../componenets/img-gallary/imgGallary";
 import Link from "next/link";
-import Rent from "../../home/Rent"; // Assuming this is the correct import
-
-// ApartmentDetails.js
+import Rent from "../../home/Rent";
+import { fetchApartmentDetails, clearApartmentDetails } from "@/store/apartmentDetailsSlice";
 
 export default function ApartmentDetails() {
-  const params = useParams(); 
-  const apartmentId = params.ApartmentId; // Extract dynamic ID correctly
-  const apartments = useSelector((state) => state.apartments.apartments);
-  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const apartmentId = params.ApartmentId;
+  const dispatch = useDispatch();
   
-  useEffect(() => {
-    if (apartments.length > 0) {
-      setLoading(false);
-    }
-  }, [apartments, apartmentId]);
+  const { apartment, loading, error } = useSelector(
+    (state) => state.apartmentDetails
+  );
 
-  const apartment = apartments.find((apt) => apt.id.toString() === apartmentId?.toString());
-  console.log(apartment)
+  useEffect(() => {
+    if (apartmentId) {
+      dispatch(fetchApartmentDetails(apartmentId));
+    }
+
+    return () => {
+      dispatch(clearApartmentDetails());
+    };
+  }, [apartmentId, dispatch]);
+
   if (loading) {
-    return <p className="text-center text-blue-500 pt-44">Loading apartments...</p>;
+    return <p className="text-center text-blue-500 pt-44">Loading apartment details...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500 pt-44">Error: {error}</p>;
   }
 
   if (!apartment) {
     return <p className="text-center text-red-500 pt-44">Apartment not found.</p>;
   }
 
+  // Parse amenities if they're in string format
+  const amenities = Array.isArray(apartment.amenities)
+    ? apartment.amenities
+    : apartment.amenities?.split(",") || [];
+
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
       <main className="py-4">
         {/* Image Gallery Section */}
         <div className="w-full relative">
-          <ImgGallery images={apartment.images} />
+          <ImgGallery images={[apartment.image]} />
         </div>
 
         {/* Apartment Details Section */}
@@ -45,24 +58,27 @@ export default function ApartmentDetails() {
           <ul className="mt-4 flex flex-wrap gap-6 justify-between items-center mb-6">
             <ul className="flex flex-wrap gap-6">
               <li className="flex items-center gap-2">
-                <i className="fa-solid fa-bed text-purple-500"></i> {apartment.bedrooms} Bedrooms
+                <i className="fa-solid fa-bed text-purple-500"></i> {apartment.beds} Bedrooms
               </li>
               <li className="flex items-center gap-2">
                 <i className="fa-solid fa-bath text-purple-500"></i> {apartment.bathrooms} Bathrooms
               </li>
-             
               <li className="flex items-center gap-2">
                 <i className="fa-solid fa-car text-purple-500"></i> Private Parking
               </li>
-              <li className="flex items-center gap-2">
-                <i className="fa-solid fa-swimming-pool text-purple-500"></i> Swimming Pool
-              </li>
-              <li className="flex items-center gap-2">
-                <i className="fa-solid fa-wifi text-purple-500"></i> Free Wi-Fi
-              </li>
+              {amenities.includes("Swimming Pool") && (
+                <li className="flex items-center gap-2">
+                  <i className="fa-solid fa-swimming-pool text-purple-500"></i> Swimming Pool
+                </li>
+              )}
+              {amenities.includes("Wi-Fi") && (
+                <li className="flex items-center gap-2">
+                  <i className="fa-solid fa-wifi text-purple-500"></i> Free Wi-Fi
+                </li>
+              )}
             </ul>
             <li className="flex gap-4">
-              <a href="tel:+971500000000">
+              <a href={`tel:${apartment.phone || "+971500000000"}`}>
                 <button
                   type="button"
                   className="flex items-center justify-center gap-2 rounded bg-gray-400 px-6 py-3 text-white font-medium uppercase leading-normal shadow-md hover:bg-green-600 transition duration-150"
@@ -71,9 +87,8 @@ export default function ApartmentDetails() {
                 </button>
               </a>
 
-              {/* WhatsApp Button */}
               <a
-                href="https://wa.me/+971500000000"
+                href={`https://wa.me/${apartment.phone || "+971500000000"}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -90,7 +105,6 @@ export default function ApartmentDetails() {
 
         {/* Description and Rent Section */}
         <div className="flex flex-col lg:flex-row gap-6 mt-8">
-          {/* Description Section */}
           <div className="w-full lg:w-2/3">
             <p className="text-xl font-semibold">{apartment.title}</p>
             <Link
@@ -103,44 +117,37 @@ export default function ApartmentDetails() {
             <p className="mt-4 text-gray-700">
               <span className="font-bold text-lg">Description:</span> {apartment.description}
             </p>
-
-            {/* Rent Component */}
-            
           </div>
 
-          {/* Brief Information Section */}
           <div className="w-full lg:w-1/3">
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <p className="text-lg font-semibold">Brief Information</p>
               <p className="font-bold text-xl mt-4">Owner: Dubi Real Estate Agency</p>
 
-              {/* Features */}
               <div className="flex justify-around bg-gray-100 p-4 rounded-lg mt-6">
                 <div className="flex items-center gap-2">
-                  <i className="fa fa-bed text-purple-500"></i> {apartment.bedrooms}
+                  <i className="fa fa-bed text-purple-500"></i> {apartment.beds}
                 </div>
                 <div className="flex items-center gap-2">
                   <i className="fa-solid fa-bath text-purple-500"></i> {apartment.bathrooms}
                 </div>
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-arrows-left-right-to-line text-purple-500"></i> 200,000 M
+                  <i className="fa-solid fa-arrows-left-right-to-line text-purple-500"></i> {apartment.land_space} sqft
                 </div>
               </div>
 
-              {/* Rental Period */}
               <div className="flex border border-gray-300 rounded-lg overflow-hidden mt-6">
                 <div className="flex-1 p-4 text-center">
                   <p>1-week rental:</p>
-                  <strong>500,000 AED</strong>
+                  <strong>{(apartment.rent_amount * 52).toLocaleString()} {apartment.price_unit}</strong>
                 </div>
                 <div className="w-px bg-gray-300"></div>
                 <div className="flex-1 p-4 text-center">
                   <p>1-Year rental:</p>
-                  <strong>6,000,000 AED</strong>
+                  <strong>{(apartment.rent_amount * 12).toLocaleString()} {apartment.price_unit}</strong>
                 </div>
               </div>
 
-              {/* View More Plans Button */}
               <Link href="/site/Plans">
                 <button
                   type="button"
@@ -153,8 +160,8 @@ export default function ApartmentDetails() {
           </div>
         </div>
         <div className="mt-8">
-              <Rent moreSetting={{ slidesToShow: 3 }} />
-            </div>
+          <Rent moreSetting={{ slidesToShow: 3 }} />
+        </div>
       </main>
     </section>
   );

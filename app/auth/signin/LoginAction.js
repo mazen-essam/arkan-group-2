@@ -4,12 +4,12 @@ import { cookies } from "next/headers";
 export async function loginAction({ email, password }) {
   console.log("🔹 loginAction function is running!"); // ✅ Debug log 1
 
-  const api_URL = "http://localhost:3001";
-  console.log("Sending request to API:", api_URL, { email, password }); // ✅ Debug log 2
+  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+  console.log("Sending request to API:", NEXT_PUBLIC_API_URL, { email, password }); // ✅ Debug log 2
 
   try {
     // 🔹 Send request to your external API
-    const response = await fetch(`${api_URL}/login`, {
+    const response = await fetch(`${NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

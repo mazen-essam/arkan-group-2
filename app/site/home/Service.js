@@ -99,7 +99,7 @@ export default function Service() {
 
 {
     // try {
-  //   const { data } = await axios.get(`${API_URL}/services`);
+  //   const { data } = await axios.get(`${NEXT_PUBLIC_API_URL}/services`);
   //   serviceList = data;
   // } catch (error) {
   //   errorMessage = "Error fetching services. Please try again later.";

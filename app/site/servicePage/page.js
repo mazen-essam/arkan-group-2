@@ -35,7 +35,7 @@ export default function ServicePage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/submit",
+        "process.env.NEXT_PUBLIC_API_URL/submit",
         formData
       );
       console.log("Success:", response.data);

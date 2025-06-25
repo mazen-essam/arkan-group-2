@@ -1,8 +1,16 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import RentCardList from "../Cards/rentCardListView";
-import AOS from "aos";
+import dynamic from "next/dynamic";
+
+// Dynamically import AOS to avoid SSR issues
+const AOS = dynamic(
+  () => import("aos").then((mod) => mod),
+  { ssr: false }
+);
+
+// Action imports
 import {
   setSearchQuery,
   setMinPrice,
@@ -12,41 +20,71 @@ import {
   toggleFurnitureFilter,
   togglePaymentPlanFilter,
   setSortBy,
-} from "../../store/fakePropertySlice.js";
+  fetchProperties,
+} from "../../store/propertiesSlice";
 
-export default function RentPage() {
+function RentPage() {
   const dispatch = useDispatch();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Get state from Redux
+  // Safely access Redux state with defaults
   const {
-    apartments,
-    searchQuery,
-    minPrice,
-    maxPrice,
-    selectedTypes,
-    selectedBedrooms,
-    selectedFurniture,
-    selectedPaymentPlans,
-    sortBy,
-  } = useSelector((state) => state.apartments);
+    properties = [],
+    loading = false,
+    error = null,
+    searchQuery = "",
+    minPrice = "",
+    maxPrice = "",
+    selectedTypes = [],
+    selectedBedrooms = [],
+    selectedFurniture = [],
+    selectedPaymentPlans = [],
+    sortBy = "default",
+  } = useSelector((state) => state.properties || {});
 
-  // Filter and sort logic
-  const filteredList = apartments.filter((p) => {
-    const matchesSearch = p.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+  useEffect(() => {
+    setIsMounted(true);
+    dispatch(fetchProperties());
+
+    // Initialize AOS after component mounts
+    if (typeof window !== "undefined") {
+      import("aos").then((AOS) => {
+        AOS.init({
+          duration: 800,
+          once: true,
+          easing: "ease-in-out",
+        });
+      });
+    }
+  }, [dispatch]);
+
+  // Safe filtering with null checks
+  const filteredList = properties.filter((p) => {
+    if (!p) return false;
+
+    const matchesSearch = searchQuery
+      ? (p.title || "").toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
     const matchesPrice =
-      (!minPrice || p.price >= parseInt(minPrice)) &&
-      (!maxPrice || p.price <= parseInt(maxPrice));
+      (!minPrice || (p.price || 0) >= parseInt(minPrice)) &&
+      (!maxPrice || (p.price || 0) <= parseInt(maxPrice));
+
     const matchesType =
-      selectedTypes.length === 0 || selectedTypes.includes(p.type);
+      selectedTypes.length === 0 ||
+      (p.features && selectedTypes.includes(p.features));
+
     const matchesBedrooms =
-      selectedBedrooms.length === 0 || selectedBedrooms.includes(p.bedrooms);
+      selectedBedrooms.length === 0 ||
+      (p.beds !== undefined && selectedBedrooms.includes(p.beds));
+
     const matchesFurniture =
-      selectedFurniture.length === 0 || selectedFurniture.includes(p.furnished);
+      selectedFurniture.length === 0 ||
+      (p.is_furnished !== undefined && selectedFurniture.includes(p.is_furnished));
+
+    const paymentPlan = p.lease_start ? "Leased" : "Available";
     const matchesPaymentPlan =
-      selectedPaymentPlans.length === 0 ||
-      selectedPaymentPlans.includes(p.paymentPlan);
+      selectedPaymentPlans.length === 0 || selectedPaymentPlans.includes(paymentPlan);
 
     return (
       matchesSearch &&
@@ -58,38 +96,61 @@ export default function RentPage() {
     );
   });
 
+  // Safe sorting
   const sortedList = [...filteredList].sort((a, b) => {
-    if (sortBy === "priceLowToHigh") {
-      return a.price - b.price;
-    } else if (sortBy === "priceHighToLow") {
-      return b.price - a.price;
-    } else if (sortBy === "ratingHighToLow") {
-      return b.rating - a.rating;
-    } else {
-      return 0; // Default order
-    }
+    if (!a || !b) return 0;
+    if (sortBy === "priceLowToHigh") return (a.price || 0) - (b.price || 0);
+    if (sortBy === "priceHighToLow") return (b.price || 0) - (a.price || 0);
+    return 0;
   });
 
-  useEffect(() => {
-    AOS.init({
-      duration: 800, // Animation duration
-      once: true, // Ensures animation runs once
-      easing: "ease-in-out",
-    });
-  }, []);
+  // Get unique values safely
+  const propertyTypes = [
+    ...new Set(properties.map((p) => p?.features).filter(Boolean)),
+  ];
+  const bedroomCounts = [
+    ...new Set(properties.map((p) => p?.beds).filter(Number.isFinite)),
+  ].sort((a, b) => a - b);
+  const paymentPlans = ["Leased", "Available"];
 
-  // Helper function to get unique values
-  const propertyTypes = [...new Set(apartments.map((p) => p.type))];
-  const bedroomCounts = [...new Set(apartments.map((p) => p.bedrooms))].sort(
-    (a, b) => a - b
-  );
-  const paymentPlans = [...new Set(apartments.map((p) => p.paymentPlan))];
+  if (!isMounted) {
+    // Server-side render fallback
+    return (
+      <div className="container mx-auto p-4 pt-36">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1 p-4 border rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Loading filters...</h2>
+          </div>
+          <div className="md:col-span-3">
+            <h1 className="text-2xl font-bold mb-4">Loading properties...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 pt-36">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[rgb(0,48,85)]"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 pt-36">
+        <div className="text-center text-red-500 text-xl">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <section className="container mx-auto p-4 pt-36">
-      {/* Top Search and Sort Bar */}
+      {/* Search and Sort Bar */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        {/* Search Bar with Icon */}
         <div className="relative w-full">
           <input
             type="text"
@@ -98,23 +159,9 @@ export default function RentPage() {
             onChange={(e) => dispatch(setSearchQuery(e.target.value))}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          {/* Search icon */}
         </div>
 
-        {/* Sort Dropdown with Icon */}
         <div className="relative w-full md:w-1/4">
           <select
             value={sortBy}
@@ -124,34 +171,17 @@ export default function RentPage() {
             <option value="default">Sort By</option>
             <option value="priceLowToHigh">Price: Low to High</option>
             <option value="priceHighToLow">Price: High to Low</option>
-            <option value="ratingHighToLow">Rating: High to Low</option>
           </select>
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          {/* Dropdown icon */}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Sidebar Filters */}
-        <aside
-          className="md:col-span-1 p-4 border rounded-lg"
-          data-aos="fade-right"
-        >
+        {/* Filters Sidebar */}
+        <aside className="md:col-span-1 p-4 border rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Filters</h2>
-
-          {/* Price Range Filter */}
+          
+          {/* Price Filter */}
           <div className="border-b border-gray-300 pb-4 mb-4">
             <label className="block font-medium mb-2">Price Range</label>
             <div className="flex gap-2">
@@ -190,9 +220,9 @@ export default function RentPage() {
             </div>
           </div>
 
-          {/* Bedroom Filter */}
+          {/* Bedrooms Filter */}
           <div className="border-b border-gray-300 pb-4 mb-4">
-            <label className="block font-medium mb-2">Number of Bedrooms</label>
+            <label className="block font-medium mb-2">Bedrooms</label>
             <div className="space-y-2">
               {bedroomCounts.map((count) => (
                 <label key={count} className="flex items-center gap-2">
@@ -234,7 +264,7 @@ export default function RentPage() {
           </div>
 
           {/* Payment Plan Filter */}
-          <div className="border-b border-gray-300 pb-4 mb-4">
+          <div className="pb-4 mb-4">
             <label className="block font-medium mb-2">Payment Plan</label>
             <div className="space-y-2">
               {paymentPlans.map((plan) => (
@@ -252,24 +282,31 @@ export default function RentPage() {
           </div>
         </aside>
 
-        {/* Main Content */}
+        {/* Properties List */}
         <main className="md:col-span-3">
           <h1 className="text-2xl font-bold mb-4">
-            Compounds In Egypt{" "}
-            <span className="text-gray-600">({sortedList.length})</span>
+            Available Properties <span className="text-gray-600">({sortedList.length})</span>
           </h1>
 
-          {/* Property Grid */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-8"
-            data-aos="fade-left"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-8">
             {sortedList.length > 0 ? (
               sortedList.map((item) => (
-                <RentCardList key={item.id} property={item} />
+                <RentCardList
+                  key={item.id}
+                  property={{
+                    ...item,
+                    bedrooms: item.beds,
+                    furnished: item.is_furnished,
+                    type: item.features,
+                    paymentPlan: item.lease_start ? "Leased" : "Available",
+                    // amenities: item.amenities ? item.amenities.split(",") : [],
+                  }}
+                />
               ))
             ) : (
-              <p>No properties available.</p>
+              <p className="text-center py-8 text-gray-500">
+                No properties match your filters
+              </p>
             )}
           </div>
         </main>
@@ -278,76 +315,4 @@ export default function RentPage() {
   );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-// const rentList = [
-//   {
-//     id: 1,
-//     title: "Modern Apartment in Downtown",
-//     price: 1200,
-//     type: "Apartment",
-//     bedrooms: 2,
-//     furnished: true,
-//     paymentPlan: "Monthly",
-//     location: "Downtown, Cairo",
-//     rating: 4.5,
-//     reviews: 25,
-//     amenities: ["Swimming Pool", "Gym", "Parking"],
-//     description:
-//       "A modern and spacious apartment located in the heart of downtown, perfect for professionals.",
-//   },
-//   {
-//     id: 2,
-//     title: "Cozy Studio Near the Park",
-//     price: 950,
-//     type: "Studio",
-//     bedrooms: 1,
-//     furnished: false,
-//     paymentPlan: "Yearly",
-//     location: "Zamalek, Cairo",
-//     rating: 4.0,
-//     reviews: 18,
-//     amenities: ["Parking", "Balcony"],
-//     description:
-//       "A cozy studio with a beautiful view of the park, ideal for singles or couples.",
-//   },
-//   {
-//     id: 3,
-//     title: "Luxury Condo with Pool",
-//     price: 2500,
-//     type: "Condo",
-//     bedrooms: 3,
-//     furnished: true,
-//     paymentPlan: "Monthly",
-//     location: "New Cairo",
-//     rating: 4.8,
-//     reviews: 30,
-//     amenities: ["Swimming Pool", "Gym", "Parking", "24/7 Security"],
-//     description:
-//       "A luxurious condo with premium amenities, located in a secure compound.",
-//   },
-//   {
-//     id: 4,
-//     title: "Elegant Loft in City Center",
-//     price: 1800,
-//     type: "Loft",
-//     bedrooms: 1,
-//     furnished: false,
-//     paymentPlan: "Yearly",
-//     location: "Maadi, Cairo",
-//     rating: 4.2,
-//     reviews: 22,
-//     amenities: ["High Ceilings", "Open Floor Plan"],
-//     description:
-//       "An elegant loft with high ceilings and an open floor plan, perfect for creative professionals.",
-//   },
-// ];
+export default dynamic(() => Promise.resolve(RentPage), { ssr: false });

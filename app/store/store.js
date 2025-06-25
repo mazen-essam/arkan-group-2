@@ -1,21 +1,18 @@
+// store.js
 import { configureStore } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
-import propertiesSlice from "./propertiesSlice";
-import serviceSlice from "./serviceSlice";
-import apartmentsReducer from "./fakePropertySlice";
+import propertySlice from "./propertiesSlice"; // Your real property slice
+import serviceSlice from "./serviceSlice"; // Your other slices
+import apartmentDetailsReducer from "./apartmentDetailsSlice";
 
-// Create the store
 const makeStore = () =>
   configureStore({
     reducer: {
       service: serviceSlice,
-      rent: propertiesSlice,
-      apartments: apartmentsReducer,
+      properties: propertySlice, // Only use the real property slice\
+      apartmentDetails: apartmentDetailsReducer,
     },
   });
 
-// Create the wrapper
 export const wrapper = createWrapper(makeStore);
-
-// Export the store for client-side usage
 export const store = makeStore();

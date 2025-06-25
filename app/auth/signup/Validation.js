@@ -5,7 +5,7 @@ import { useState ,useEffect } from 'react';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
 export default function Validation() {
-    const api_URL = "http://localhost:3001";
+    const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
     let router = useRouter();
     let [formData, setFormData] = useState({
         firstName: "",
@@ -55,7 +55,7 @@ export default function Validation() {
         setErrors(validationError);
         if (Object.keys(validationError).length === 0) {
             console.log("form submitted successfully!", formData);
-            const response = await fetch(`${api_URL}/register`, {
+            const response = await fetch(`${NEXT_PUBLIC_API_URL}/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

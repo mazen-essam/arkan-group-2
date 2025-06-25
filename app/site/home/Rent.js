@@ -1,131 +1,140 @@
-"use client"; // Add this since React Slick requires client-side interactivity
-import "@fortawesome/fontawesome-free/css/all.min.css";
+"use client";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import RentCard from "../Cards/rentCard";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import Aos from "aos";
 import "aos/dist/aos.css";
-const properties = [
-  {
-    id: 1,
-    image: "/background3.jpg",
-    title: "Luxury Villa with Pool",
-    price: 500000,
-    price_unit: "USD",
-    beds: 4,
-    bathrooms: 3,
-    land_space: "5000 sqft",
-    location: "Beverly Hills, CA",
-  },
-  {
-    id: 2,
-    image: "/img1.png",
-    title: "Modern Apartment Downtown",
-    price: 250000,
-    price_unit: "USD",
-    beds: 2,
-    bathrooms: 2,
-    land_space: "1200 sqft",
-    location: "New York, NY",
-  },
-  {
-    id: 3,
-    image: "/img2.jpg",
-    title: "Beachfront Bungalow",
-    price: 750000,
-    price_unit: "USD",
-    beds: 3,
-    bathrooms: 2,
-    land_space: "3000 sqft",
-    location: "Miami, FL",
-  },
-  {
-    id: 4,
-    image: "/img3.jpg",
-    title: "Cozy Mountain Cabin",
-    price: 200000,
-    price_unit: "USD",
-    beds: 2,
-    bathrooms: 1,
-    land_space: "1500 sqft",
-    location: "Aspen, CO",
-  },
-];
+import { fetchProperties } from "../../store/propertiesSlice";
+
+const DynamicSlider = dynamic(() => import("react-slick"), {
+  ssr: false,
+  loading: () => <div className="slick-loading">Loading...</div>,
+});
 
 export default function Rent({ classes = "", moreSetting = {}, header }) {
-  // React Slick settings
-  const settings = {
-    dots: true, // Show pagination dots
-    infinite: true, // Infinite looping
-    autoplay: true, // Auto-play the carousel
-    autoplaySpeed: 2000, // Speed of auto-play
-    arrows: false, // Show next/prev arrows
-    speed: 500, // Transition speed
+  const [isMounted, setIsMounted] = useState(false);
+  const dispatch = useDispatch();
 
-    speed: 500, // Transition speed
-    slidesToShow: 3, // Number of cards to show at once
-    slidesToScroll: 1, // Number of cards to scroll
-    responsive: [
-      {
-        breakpoint: 1024, // For screens smaller than 1024px
-        settings: {
-          slidesToShow: 2, // Show 2 cards
-        },
-      },
-      {
-        breakpoint: 768, // For screens smaller than 768px
-        settings: {
-          slidesToShow: 1, // Show 1 card
-        },
-      },
-    ],
-  };
+  const { properties = [], loading, error } = useSelector(
+    (state) => state.properties || {}
+  );
+
   useEffect(() => {
+    setIsMounted(true);
+    dispatch(fetchProperties());
     Aos.init({ duration: 700, once: true });
-  }, []);
+  }, [dispatch]);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    arrows: false,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
+    ],
+    ...moreSetting,
+  };
+
+  if (!isMounted || loading) {
+    return (
+      <section className={`container mx-auto my-12 Rent ${classes}`}>
+        <h1 className="font-bold text-2xl mb-6">
+          {header || "Explore our Properties"}
+        </h1>
+        <div className="text-center py-8">Loading properties...</div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={`container mx-auto my-12 Rent ${classes}`}>
+        <h1 className="font-bold text-2xl mb-6">
+          {header || "Error loading properties"}
+        </h1>
+        <div className="text-center text-red-500 py-8">
+          Error: {error.message || "Failed to load properties"}
+        </div>
+      </section>
+    );
+  }
+
+  // ✅ Optional: filter by status
+  // const filteredProperties = properties.filter(
+  //   (p) => p.status?.toLowerCase().trim() === "available"
+  // );
+
+  const parsedProperties = properties.map((property) => {
+    // Parse amenities
+    let parsedAmenities = [];
+    if (Array.isArray(property.amenities)) {
+      parsedAmenities = property.amenities.flatMap((a) => {
+        try {
+          return Object.values(JSON.parse(a));
+        } catch (err) {
+          return a.replace(/["{}]/g, "").split(":")[1]?.trim() || "";
+        }
+      });
+    }
+
+    // Parse type (not used here but parsed in case you need it)
+    let parsedType = {};
+    try {
+      parsedType = JSON.parse(property.type);
+    } catch (e) {
+      parsedType = {};
+    }
+
+    return {
+      ...property,
+      amenities: parsedAmenities,
+      type: parsedType,
+    };
+  });
 
   return (
     <section
       style={{ padding: "50px 0" }}
       className={`container mx-auto my-12 Rent ${classes}`}
-      data-aos="fade-up"
     >
       <h1 className="font-bold text-2xl mb-6">
-        {header != "" ? header : "Explore our Apartments for rent"}
+        {header || "Explore our Properties"}
       </h1>
-      <Slider {...settings} {...moreSetting}>
-        {properties.map((item) => (
-          <div key={item.id} className="px-2">
-            {" "}
-            {/* Add padding between cards */}
-            <Link href={`/site/ApartmentDetails/${item.id}`} passHref>
-              <RentCard property={item} />
-            </Link>
-          </div>
-        ))}
-      </Slider>
+
+      {parsedProperties.length > 0 ? (
+        <DynamicSlider {...settings}>
+          {parsedProperties.map((property) => (
+            <div key={property.id} className="px-2">
+              <Link href={`/site/ApartmentDetails/${property.id}`} passHref>
+                <RentCard
+                  property={{
+                    id: property.id,
+                    image: property.image || "/default-property.jpg",
+                    title: property.title || "Untitled Property",
+                    price: property.price || 0,
+                    price_unit: property.price_unit || "USD",
+                    beds: property.beds || 0,
+                    bathrooms: property.bathrooms || 0,
+                    land_space: `${property.land_space || 0} sqft`,
+                    location: property.location || "Location not specified",
+                    amenities: property.amenities,
+                  }}
+                />
+              </Link>
+            </div>
+          ))}
+        </DynamicSlider>
+      ) : (
+        <div className="text-center py-8">No properties available at the moment</div>
+      )}
     </section>
   );
-}
-
-{
-  /* <Link
-key={item.id}
-href={`/site/servicePage?id=${item.id}`}
-passHref
->
-<RentCard property={item} />
-</Link> */
-}
-{
-  // const API_URL = "http://localhost:3001";
-  // try {
-  //     const response = await axios.get(`${API_URL}/properties`);
-  //     const rentList = response.data;
-  // } catch (error) {
-  //     return <p>Error fetching services:{error.message}</p>
-  // }
 }

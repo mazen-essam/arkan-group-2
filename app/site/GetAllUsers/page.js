@@ -1,9 +1,9 @@
 import UserCard from "../Cards/UserCard";
 import AddUserForm from "./AddUserForm";
 export default async function GetAllUsers() {
-    const api_URL = "http://localhost:3001";
+    const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-    const response = await fetch(`${api_URL}/api/users`, {
+    const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/users`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store", // Ensures fresh data on each request

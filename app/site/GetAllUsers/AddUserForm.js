@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function CreateUserForm() {
-    const api_URL = "http://localhost:3001";
+    const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
     const [UserForm, SetUserForm] = -useState({
         first_name: "",
         last_name: "",
@@ -17,7 +17,7 @@ export default function CreateUserForm() {
     const [isOpen, setIsOpen] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`${api_URL}/users`, {
+        const response = await fetch(`${NEXT_PUBLIC_API_URL}/users`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(UserForm),

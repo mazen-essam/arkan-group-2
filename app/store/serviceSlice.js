@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
-const api_URL = "";
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const fetchData = createAsyncThunk("api/fetchData", async () => {
-    const response = await axios.get(`${api_URL}/services`);
+    const response = await axios.get(`${NEXT_PUBLIC_API_URL}/services`);
     return response.data;
 });
 const initialState = {

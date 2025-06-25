@@ -1,8 +1,8 @@
 export default async function UserDetails({ params }) {
     const { id } = params;
-    const api_URL = "http://localhost:3001";
+    const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-    const response = await fetch(`${api_URL}/users/${id}`, {
+    const response = await fetch(`${NEXT_PUBLIC_API_URL}/users/${id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store"

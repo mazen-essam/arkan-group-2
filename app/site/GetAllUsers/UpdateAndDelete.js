@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export default function UserActions({ user }) {
-    const api_URL = "http://localhost:3001";
+    const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         first_name: user.first_name,
@@ -24,7 +24,7 @@ export default function UserActions({ user }) {
     const handleUpdate = async (e) => {
         e.preventDefault();
 
-        const response = await fetch(`${api_URL}/users/${user.id}`, {
+        const response = await fetch(`${NEXT_PUBLIC_API_URL}/users/${user.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData),
@@ -43,7 +43,7 @@ export default function UserActions({ user }) {
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to delete this user?")) return;
 
-        const response = await fetch(`${api_URL}/api/users/${user.id}`, {
+        const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/${user.id}`, {
             method: "DELETE",
         });
 
