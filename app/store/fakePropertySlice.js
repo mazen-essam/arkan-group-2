@@ -7,7 +7,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const fetchProperties = createAsyncThunk(
   "properties/fetchProperties",
   async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/properties`);
+    const response = await axios.get(`${API_BASE_URL}/api/properties`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'apiKey': '1234'
+        }
+      });
     return response.data.data; // Access the 'data' array from the response
   }
 );
