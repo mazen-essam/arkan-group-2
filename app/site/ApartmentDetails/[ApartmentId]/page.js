@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import ImgGallery from "../../../componenets/img-gallary/imgGallary";
 import Link from "next/link";
 import Rent from "../../home/Rent";
-import { fetchApartmentDetails, clearApartmentDetails } from "@/store/apartmentDetailsSlice";
+import { fetchApartmentDetails, clearApartmentDetails } from "../../../store/apartmentDetailsSlice";
 
 export default function ApartmentDetails() {
   const params = useParams();
